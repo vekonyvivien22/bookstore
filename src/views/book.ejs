@@ -1,0 +1,38 @@
+<%- include('header') %>
+<%- include('nav') %>
+	<div class="container">
+		<div class="row">
+			<div class="mb-5 col-md-4" >
+        <%= book.title %>
+        <img src="data:image/<%= book.image.contentType %>;base64,<%=book.image.data.toString('base64') %>"/>
+			</div>
+			<div class="mb-5 col-md-8">
+				<div class="p-4">
+					<h1><%= book.title %></h1>
+					<h5><span th:text="${book.publicationDate}"></span>, <span> <%= book.publisherName %> (publisher)</span></h5>
+					<h5> <span th:text="${#numbers.formatDecimal(book.getPrice(), 1, 'COMMA', 1, 'POINT')}"></span> Ft</h5>
+					<h5><span class= "fa fa-star checked" th:text="${#numbers.formatDecimal(book.getRate(), 1, 'COMMA', 1, 'POINT')}"></span></h5>
+					<h3>Auhtor/s:</h3>
+					<span th:each="author : ${book.getAuthors()}"><span th:text="${author.getName()}"></span>, </span>
+					<h3>Description:</h3>
+					<span th:text="${book.description}"></span>
+					<p class = "mt-5">
+						<span>Size: <span th:text="${book.size}"></span></span>,
+						<span>Binding: <span th:text="${book.binding}"></span></span>,
+						<span><span th:text="${book.numberOfPages}"></span> pages</span>
+					</p>
+					
+					<span class = "mt-2 mb-2">This book is available in 
+						<span th:each="store : ${storesStock}">
+							<span th:text=${store.name}></span>, 
+						</span>
+					</span><br>
+					
+					<a class="btn btn-primary mt-5" role="button" th:href="@{/add{id}(id=${book.id})}">Add to cart!</a><br>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="javascript" src="/js/jquery.min.js"/>
+	<script type="javascript" src="/js/bootstrap.min.js"/>
+<%- include('footer') %>
