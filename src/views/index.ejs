@@ -1,0 +1,75 @@
+<%- include('header') %>
+<%- include('nav') %>
+	<h1 th:if="${user == null}" class="text-center mt-5">Bookshop homepage</h1>
+	<h1 th:unless="${user == null}" class="text-center mt-5">Welcome <span th:text="${user.username}"></span> !</h1>
+	
+	<h1 class="mt-5 text-center">Newest books:</h1>
+	<div class="bd-example container bg-dark mb-5">
+	  <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
+	    <ol class="carousel-indicators" >
+	      <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
+	      <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
+	      <li data-target="#carouselExampleCaptions" data-slide-to="2"></li>
+	    </ol>
+	    <div class="carousel-inner">
+	      <div class="carousel-item" th:each="book : ${newBooks}">
+	      	<a th:href="@{/book{id}(id=${book.id})}">
+		      	<img style="height: 500px; width:337px;" th:src="${book.image}" class="d-block m-auto" alt="...">
+		        <div class="carousel-caption d-none d-md-block text-right">
+		          <h3 th:text="${book.title}"></h3>
+		          <p class="card-text fa fa-star checked">	<span th:text="${#numbers.formatDecimal(book.getRate(), 1, 'COMMA', 1, 'POINT')}"></span></p>
+		          <p class="card-text fa fa-calendar checked">	<span th:text="${book.publicationDate}"></span></p>
+		        </div>
+		    </a>
+	      </div>
+	    </div>
+	    <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
+	      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+	      <span class="sr-only">Previous</span>
+	    </a>
+	    <a class="carousel-control-next" href="#carouselExampleCaptions" role="button" data-slide="next">
+	      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+	      <span class="sr-only">Next</span>
+	    </a>
+	  </div>
+	</div>
+	
+	<h1 class="mt-5 text-center">Top rated books:</h1>
+	<div class="bd-example container bg-dark mb-5">
+	  <div id="carouselExampleCaptions2" class="carousel slide" data-ride="carousel2">
+	    <ol class="carousel-indicators">
+	      <li data-target="#carouselExampleCaptions2" data-slide-to="0" class="active"></li>
+	      <li data-target="#carouselExampleCaptions2" data-slide-to="1"></li>
+	      <li data-target="#carouselExampleCaptions2" data-slide-to="2"></li>
+	    </ol>
+	    <div class="carousel-inner">
+	      <div class="carousel-item" th:each="book : ${topBooks}">
+	      	<a th:href="@{/book{id}(id=${book.id})}">
+		      	<img style="height: 500px; width:337px;" th:src="${book.image}" class="d-block m-auto" alt="...">
+		        <div class="carousel-caption d-none d-md-block text-right">
+		          <h3 th:text="${book.title}"></h3>
+		          <p class="card-text fa fa-star checked">	<span th:text="${#numbers.formatDecimal(book.getRate(), 1, 'COMMA', 1, 'POINT')}"></span></p>
+		          <p class="card-text fa fa-calendar checked">	<span th:text="${book.publicationDate}"></span></p>
+		        </div>
+		    </a>
+	      </div>
+	    </div>
+	    <a class="carousel-control-prev" href="#carouselExampleCaptions2" role="button" data-slide="prev">
+	      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+	      <span class="sr-only">Previous</span>
+	    </a>
+	    <a class="carousel-control-next" href="#carouselExampleCaptions2" role="button" data-slide="next">
+	      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+	      <span class="sr-only">Next</span>
+	    </a>
+	  </div>
+	</div>
+	
+	<footer th:insert="footer.html"></footer>
+		
+	<script src = "js/jquery.min.js"></script>
+	<script src = "js/bootstrap.min.js"></script>
+	<script>
+		$('.carousel-item:nth-child(1)').addClass('active')
+	</script>
+<%- include('footer') %>

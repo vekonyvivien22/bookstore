@@ -38,23 +38,23 @@ app.use('/user', require('./routes/user.routes'));
 const models = {
   book: mongoose.model('book'),
   category: mongoose.model('category'),
-  stores: mongoose.model('store'),
+  store: mongoose.model('store'),
 };
 
 app.get('/', (req, res) => {
   const categories = models.category.find();
   const stores = models.store.find();
-  const newestBooks = models.book.find();
-  const topBooks = models.book.find();
-  //return res.send('szia');
+  const newestBooks = models.book.find().sort({publicationDate : -1});
+  const topBooks = models.book.find().sort({rating : -1}).limit(3);
+  
   return res.render('index', { categories : categories, stores : stores, newestBooks : newestBooks, topBooks : topBooks});
 });
 
-app.post( '/categories', async (req, res) => {
-    const { name, } = req.body;
-    console.log(req.body);
+/*KAtegoriak letrehozasahoz hasznaltam
+  app.post( '/categories', async (req, res) => {
+    const { name} = req.body;
     const newCat = new models.category({
-      name,
+      name
     });
 
     try {
@@ -65,8 +65,9 @@ app.post( '/categories', async (req, res) => {
       return res.send('szia nem sikerult kategoriat letreghozni');
     }
   },
-);
+);*/
 
+/* Boltok leterhozasahoz hasznaltam
 app.post( '/stores', async (req, res) => {
   const {
     name, 
@@ -85,7 +86,7 @@ app.post( '/stores', async (req, res) => {
   }
 },
 );
-
+*/
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
