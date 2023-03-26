@@ -28,12 +28,64 @@ mongoose.connection.on('error', (error) => {
 });
 
 require('./schemas/book.schema');
+require('./schemas/category.schema');
+require('./schemas/store.schema');
 
 app.use('/admin', require('./routes/admin.routes'));
+app.use('/browse', require('./routes/browse.routes'));
+app.use('/user', require('./routes/user.routes'));
+
+const models = {
+  book: mongoose.model('book'),
+  category: mongoose.model('category'),
+  stores: mongoose.model('store'),
+};
 
 app.get('/', (req, res) => {
-  return res.send('szia');
+  const categories = models.category.find();
+  const stores = models.store.find();
+  const newestBooks = models.book.find();
+  const topBooks = models.book.find();
+  //return res.send('szia');
+  return res.render('index', { categories : categories, stores : stores, newestBooks : newestBooks, topBooks : topBooks});
 });
+
+app.post( '/categories', async (req, res) => {
+    const { name, } = req.body;
+    console.log(req.body);
+    const newCat = new models.category({
+      name,
+    });
+
+    try {
+      const createdCat = await newCat.save();
+      return res.send(createdCat);
+    } catch (error) {
+      console.log(error);
+      return res.send('szia nem sikerult kategoriat letreghozni');
+    }
+  },
+);
+
+app.post( '/stores', async (req, res) => {
+  const {
+    name, 
+    location,
+  } = req.body;
+  const newStore = new models.store({
+    name, location
+  });
+
+  try {
+    const createdStore = await newStore.save();
+    return res.send(createdStore);
+  } catch (error) {
+    console.log(error);
+    return res.send('szia nem sikerult boltot letreghozni');
+  }
+},
+);
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
