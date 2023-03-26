@@ -23,9 +23,9 @@ mongoose.connection.on('connected', () => {
   console.log('succesfull db connect');
 });
 
-mongoose.connection.on('error', (error) => {
+/*mongoose.connection.on('error', (error) => {
   console.log('error', error);
-});
+});*/
 
 require('./schemas/book.schema');
 require('./schemas/category.schema');
@@ -41,13 +41,13 @@ const models = {
   store: mongoose.model('store'),
 };
 
-app.get('/', (req, res) => {
-  const categories = models.category.find();
-  const stores = models.store.find();
-  const newestBooks = models.book.find().sort({publicationDate : -1});
-  const topBooks = models.book.find().sort({rating : -1}).limit(3);
+app.get('/', async (req, res) => {
+  const categories = await models.category.find();
+  const stores = await models.store.find();
+  const newestBooks = await models.book.find().sort({publicationDate : -1});
+  const topBooks = await models.book.find().sort({rating : -1}).limit(3);
   
-  return res.render('index', { categories : categories, stores : stores, newestBooks : newestBooks, topBooks : topBooks});
+  return res.render('index', { categories, stores, newestBooks, topBooks});
 });
 
 /*KAtegoriak letrehozasahoz hasznaltam

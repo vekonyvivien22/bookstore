@@ -4,6 +4,8 @@ const Multer = require('multer');
 
 const models = {
   book: mongoose.model('book'),
+  category: mongoose.model('category'),
+  store: mongoose.model('store'),
 };
 
 const templates = {
@@ -14,18 +16,21 @@ const router = express.Router();
 
 router.get('/books', async (_req, res) => {
   // const books = await models.book.find({authors: {$in: ['James', "Pali"]}});
-  //
-  const books = await models.book.find();
 
-  // return res.send(books);
+  const books = await models.book.find();
+  const categories = await models.category.find();
+  const stores = await models.store.find();
+
   return res.render('index', { random: 'hello szia' });
 });
 
-router.get('/books/:id', async (req, res) => {
+router.get('/book/:id', async (req, res) => {
   const id = req.params.id;
   const book = await models.book.findById(id);
+  const categories = await models.category.find();
+  const stores = await models.store.find();
 
-  return res.render(templates.book, { book });
+  return res.render(templates.book, { book, categories, stores });
 });
 
 router.post(

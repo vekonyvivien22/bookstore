@@ -1,0 +1,75 @@
+<%- include('header') %>
+<%- include('nav', { categories: categories, stores: stores }) %>
+    <%#<div th:if = "${errors != null}" class="alert alert-danger mr-5 ml-5 mt-5 mb-5" role="alert">
+	  	<p th:each="error : ${errors}" th:text="${error}"></p>
+	</div>%>
+	<div class="container mt-5 mb-5">
+    	<div class="row mt-5 mb-5">
+    		
+        	<div class="col-md-6">
+                    <% if (catName) { %> <h1> <%= catName %> </h1> <% } %>
+	    			<% if (storeName) { %> <h1> <%= storeName %> </h1> <% } %>
+     		</div>
+            <% if (catName) { %> 
+     		<div class="col-md-6 dropdown">
+     			<button type="button" class="btn btn-dark dropdown-toggle float-right" data-toggle="dropdown">Sort by:</button>
+          			<div class="dropdown-menu">
+            			<a class="dropdown-item" href="/browse/cat/<%= catName %>?sort=1">Alphabet (ASC)</a>
+            			<a class="dropdown-item" href="/browse/cat/<%= catName %>?sort=2">Alphabet (DESC)</a>
+            			<a class="dropdown-item" href="/browse/cat/<%= catName %>?sort=3">Score (ASC)</a>
+            			<a class="dropdown-item" href="/browse/cat/<%= catName %>?sort=4">Score (DESC)</a>
+          			</div>
+     		</div>
+            <% } %>
+            <% if (storeName) { %>
+     		<div class="col-md-6 dropdown">
+     			<button type="button" class="btn btn-dark dropdown-toggle float-right" data-toggle="dropdown">Sort by:</button>
+          			<div class="dropdown-menu">
+            			<a class="dropdown-item"  href="/browse/cat/<%= storeName %>?sort=1">Alphabet (ASC)</a>
+            			<a class="dropdown-item"  href="/browse/cat/<%= storeName %>?sort=2">Alphabet (DESC)</a>
+            			<a class="dropdown-item"  href="/browse/cat/<%= storeName %>?sort=3">Score (ASC)</a>
+            			<a class="dropdown-item"  href="/browse/cat/<%= storeName %>?sort=4">Score (DESC)</a>
+          			</div>
+     		</div>
+             <% } %>
+		</div>
+		<table class="table watched-table">
+		  <thead class="thead-dark">
+		    <tr>
+		      <th scope="col" style="width:8%" th:text="${'# ' + books.size()}"> <span> pieces</span></th>
+		      <th scope="col">Book</th>
+		      <th scope="col">Rate</th>
+		      <th scope="col">Price</th>
+		      <th scope="col">Status</th>
+		    </tr>
+		  </thead>
+		  <tbody>
+			<% books.forEach(function(book, i){ %>
+		    <tr>
+		      <th scope="row"><%= i+1 %></th>
+		      <td>
+		      	<img id="book_img" src="data:image/<%= book.image.contentType %>;base64,<%=book.image.data.toString('base64') %>" style="height: 120px;" class="img-fluid float-left" alt="Responsive image">
+           		<a href="/browse/book/<%=book.id%>"><h5 id="title" style="margin-left: 100px"><%= book.title %></h5></a>
+           		<p id="nomargin" class="text-muted" style="margin-left: 100px"><%= book.publicationDate %></p>
+		      </td>
+		      <td >
+		      	<span class = "fa fa-star checked"><span><%= book.rating %></span</span> 
+		      </td>
+		      <td >
+		      	<span><span><%= book.price %></span> Ft</span> 
+		      </td>
+		      <td>
+		      	<a class="btn btn-primary" href="#" role="button" th:href="@{/add{id}(id=${book.id})}">Add to cart!</a> 
+		      </td>
+		    </tr>
+			<% }); %>
+		  </tbody>
+		</table>
+	</div>
+
+
+	<script src = "/js/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+	<script src = "/js/bootstrap.min.js"></script>
+
+<%- include('footer') %>
