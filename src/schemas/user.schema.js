@@ -1,26 +1,50 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
+const bcryptjs = require('bcryptjs');
 
 const userSchema = new mongoose.Schema(
   {
-    email: {type: String, unique: true, required: true, lowercase: true},
-    username: {type: String, unique: true, required: true, lowercase: true},
-    password: {type: String, required: true},
+    email: { type: String, unique: true, required: true, lowercase: true },
+    username: { type: String, unique: true, required: true, lowercase: true },
+    password: { type: String, required: true },
     name: {
-        firstName: String,
-        lastName: String,
+      firstName: String,
+      lastName: String,
     },
-    image: {
-        data: { type: Buffer, required: true },
-        contentType: { type: String, required: true },
-      },
     address: String,
-    superUser: { 
-        isSuper: {type: Boolean, required: true, default: false},
-        discount: {type: Number, required: true},
+    regularUser: {
+      isRegular: { type: Boolean, required: true, default: false },
+      discount: { type: Number, required: true, default: 0 },
     },
-    isActive: {type: Boolean, required: true, default: true},
+    isAdmin: { type: Boolean, required: true, default: false },
+    isActive: { type: Boolean, required: true, default: true },
   },
-  { collection: "users", timestamps: { createdAt: true, updatedAt: true } }
+  { collection: 'users', timestamps: { createdAt: true, updatedAt: true } },
 );
 
-mongoose.model("user", userSchema);
+// has user password before save
+userSchema.pre('save', function (next) {
+  const user = this;
+
+  if (user.isModified('password')) {
+    bcryptjs.genSalt(10, (error, salt) => {
+      if (error) return next(error);
+
+      bcryptjs.hash(user.password, salt, (error, hashedPassword) => {
+        if (error) return next(error);
+        user.password = hashedPassword;
+        return next();
+      });
+    });
+  } else {
+    return next();
+  }
+});
+
+// compare user password before login
+userSchema.methods.comparePasswords = function (password, next) {
+  bcryptjs.compare(password, this.password, function (error, isMatch) {
+    next(error, isMatch);
+  });
+};
+
+mongoose.model('user', userSchema);

@@ -2,12 +2,14 @@
 <%- include('nav', { categories: categories, stores: stores }) %>
     
 	<h2 class="m-5 text-center">Create an account</h2>
-	<form class="mt-5 mb-5" method="post" action="/register">
+	<form class="mt-5 mb-5" method="post" action="/user/reg">
+    <%- include('alert') %>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 		<div class="form-group row">
 	  		<div class = "col-sm-3"></div>
-	    	<label for="inputUname" class="col-sm-2 col-form-label">Username</label>
+	    	<label for="inputUsername" class="col-sm-2 col-form-label">Username</label>
 			<div class="col-sm-4">
-	      		<input type="text" class="form-control" id="inputUname" name="username" placeholder="Username">
+	      		<input type="text" class="form-control" id="inputUsername" name="username" placeholder="Username">
 	    	</div>
 	  	</div>
 	  	
@@ -23,7 +25,7 @@
 	  		<div class = "col-sm-3"></div>
 	    	<label for="inputFirstName" class="col-sm-2 col-form-label">First name</label>
 			<div class="col-sm-4">
-	      		<input type="text" class="form-control" id="inputFirstName" name="firstName">
+	      		<input type="text" class="form-control" id="inputFirstName" name="firstName" placeholder="First Name">
 	    	</div>
 	  	</div>
 	  	
@@ -31,7 +33,7 @@
 	  		<div class = "col-sm-3"></div>
 	    	<label for="inputLastName" class="col-sm-2 col-form-label">Last Name</label>
 			<div class="col-sm-4">
-	      		<input type="text" class="form-control" id="inputLastName" name="lastName">
+	      		<input type="text" class="form-control" id="inputLastName" name="lastName" placeholder="Last Name">
 	    	</div>
 	  	</div>
 	  	
@@ -39,7 +41,7 @@
 	  		<div class = "col-sm-3"></div>
 	    	<label for="inputAddress" class="col-sm-2 col-form-label">Address</label>
 			<div class="col-sm-4">
-	      		<input type="text" class="form-control" id="inputAdrress" name="address">
+	      		<input type="text" class="form-control" id="inputAdrress" name="address" placeholder="Address">
 	    	</div>
 	  	</div>
 	  	
@@ -61,17 +63,13 @@
 	
 	  	<div class="form-group row">
 	  		<div class = "col-sm-3"></div>
-	    	<div class="col-sm-6">
-	      		<button type="submit" class="btn btn-primary">Sign in</button>
+	    	<div class="col-sm-6 text-right">
+	      		<button type="submit" class="btn btn-primary">Sign up</button>
 	    	</div>
 	  	</div>
 	</form>
-	
-	<%#<div th:if = "${errors != null}" class="alert alert-danger mr-5 ml-5 mt-5 mb-5" role="alert">
-		<h4 class="alert-heading">Unsuccessful registration!</h4>
-	  	<p th:each="error : ${errors}" th:text="${error}"></p>
-	</div>%>
+
 		
-	<script src = "js/jquery.min.js"></script>
-	<script src = "js/bootstrap.min.js"></script>
+	<script  src="/js/jquery.min.js"></script>
+	<script  src="/js/bootstrap.min.js"></script>
 <%- include('footer') %>

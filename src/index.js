@@ -4,11 +4,17 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 const ejs = require('ejs');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const expressSession = require('express-session');
+const MongoStore = require('connect-mongo');
+const { ensureAdmin } = require('./utils/middlewares');
 
 const app = express();
 
 const port = process.env.PORT || 3000;
 const connectionUri = process.env.MONGODB_CONNECTION_URI;
+const secret = process.env.SESSION_SECRET;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -30,8 +36,54 @@ mongoose.connection.on('connected', () => {
 require('./schemas/book.schema');
 require('./schemas/category.schema');
 require('./schemas/store.schema');
+require('./schemas/user.schema');
 
-app.use('/admin', require('./routes/admin.routes'));
+const userModel = mongoose.model('user');
+
+passport.use(
+  'local',
+  new LocalStrategy(
+    { usernameField: 'username', passwordField: 'password' },
+    (username, password, done) => {
+      userModel.findOne({ username }, (err, user) => {
+        if (err) return done('Error during request.', null);
+        if (!user) return done(null, false);
+        user.comparePasswords(password, (error, isMatch) => {
+          if (error) return done(error, false);
+          if (!isMatch) return done(null, false);
+          return done(null, user);
+        });
+      });
+    },
+  ),
+);
+
+passport.serializeUser((user, done) => {
+  if (!user) return done('No user provided', null);
+  return done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  if (!user) return done('No user provided', null);
+  return done(null, user);
+});
+
+app.use(
+  expressSession({
+    secret,
+    resave: false,
+    saveUninitialized: true,
+    store: MongoStore.create({ mongoUrl: connectionUri }),
+    cookie: {
+      maxAge: 5 * 24 * 60 * 60 * 1000,
+    },
+  }),
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use('/admin', ensureAdmin, require('./routes/admin.routes'));
 app.use('/browse', require('./routes/browse.routes'));
 app.use('/user', require('./routes/user.routes'));
 
@@ -43,11 +95,11 @@ const models = {
 
 app.get('/', async (req, res) => {
   const categories = await models.category.find();
-  const stores = await models.store.distinct("name");
-  const newestBooks = await models.book.find().sort({publicationDate : -1});
-  const topBooks = await models.book.find().sort({rating : -1}).limit(3);
-  
-  return res.render('index', { categories, stores, newestBooks, topBooks});
+  const stores = await models.store.distinct('name');
+  const newestBooks = await models.book.find().sort({ publicationDate: -1 });
+  const topBooks = await models.book.find().sort({ rating: -1 }).limit(3);
+
+  return res.render('index', { categories, stores, newestBooks, topBooks });
 });
 
 app.listen(port, () => {
