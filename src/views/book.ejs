@@ -22,9 +22,11 @@
 					</p>
 					
 					<span class = "mt-2 mb-2">This book is available in 
-						<span th:each="store : ${storesStock}">
-							<span th:text=${store.name}></span>, 
+						<% storeStock.forEach(function(store){ %>
+						<span>
+							<span><%= store %></span>, 
 						</span>
+						<% }); %>
 					</span><br>
 					
 					<a class="btn btn-primary mt-5" role="button" th:href="@{/add{id}(id=${book.id})}">Add to cart!</a><br>

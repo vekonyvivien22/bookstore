@@ -43,50 +43,12 @@ const models = {
 
 app.get('/', async (req, res) => {
   const categories = await models.category.find();
-  const stores = await models.store.find();
+  const stores = await models.store.distinct("name");
   const newestBooks = await models.book.find().sort({publicationDate : -1});
   const topBooks = await models.book.find().sort({rating : -1}).limit(3);
   
   return res.render('index', { categories, stores, newestBooks, topBooks});
 });
-
-/*KAtegoriak letrehozasahoz hasznaltam
-  app.post( '/categories', async (req, res) => {
-    const { name} = req.body;
-    const newCat = new models.category({
-      name
-    });
-
-    try {
-      const createdCat = await newCat.save();
-      return res.send(createdCat);
-    } catch (error) {
-      console.log(error);
-      return res.send('szia nem sikerult kategoriat letreghozni');
-    }
-  },
-);*/
-
-/* Boltok leterhozasahoz hasznaltam
-app.post( '/stores', async (req, res) => {
-  const {
-    name, 
-    location,
-  } = req.body;
-  const newStore = new models.store({
-    name, location
-  });
-
-  try {
-    const createdStore = await newStore.save();
-    return res.send(createdStore);
-  } catch (error) {
-    console.log(error);
-    return res.send('szia nem sikerult boltot letreghozni');
-  }
-},
-);
-*/
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

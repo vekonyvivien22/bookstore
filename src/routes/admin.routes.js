@@ -14,7 +14,7 @@ const templates = {
 
 const router = express.Router();
 
-router.get('/books', async (_req, res) => {
+/*router.get('/books', async (_req, res) => {
   // const books = await models.book.find({authors: {$in: ['James', "Pali"]}});
 
   const books = await models.book.find();
@@ -22,17 +22,9 @@ router.get('/books', async (_req, res) => {
   const stores = await models.store.find();
 
   return res.render('index', { random: 'hello szia' });
-});
+});*/
 
-router.get('/book/:id', async (req, res) => {
-  const id = req.params.id;
-  const book = await models.book.findById(id);
-  const categories = await models.category.find();
-  const stores = await models.store.find();
-
-  return res.render(templates.book, { book, categories, stores });
-});
-
+//Könyvek létrehozásához
 router.post(
   '/books/create',
   Multer({ storage: Multer.memoryStorage() }).single('image'),
@@ -79,5 +71,49 @@ router.post(
     }
   },
 );
+
+//KAtegoriak letrehozasahoz hasznaltam
+router.post( '/categories', async (req, res) => {
+  const { name} = req.body;
+  const newCat = new models.category({
+    name
+  });
+
+  try {
+    const createdCat = await newCat.save();
+    return res.send(createdCat);
+  } catch (error) {
+    console.log(error);
+    return res.send('szia nem sikerult kategoriat letreghozni');
+  }
+},
+);
+
+// Boltok leterhozasahoz hasznaltam
+router.post( '/stores', async (req, res) => {
+  const {
+    name, 
+    location,
+    storeStock
+  } = req.body;
+  const asd = storeStock.split(";").map((book) => {
+    const [bookId, quantity] = book.split(',');
+    return {bookId, quantity};
+  });
+  console.log(asd);
+  const newStore = new models.store({
+    name, location, storeStock: asd
+  });
+
+  try {
+    const createdStore = await newStore.save();
+    return res.send(createdStore);
+  } catch (error) {
+    console.log(error);
+    return res.send('szia nem sikerult boltot letreghozni');
+  }
+},
+);
+
 
 module.exports = router;
