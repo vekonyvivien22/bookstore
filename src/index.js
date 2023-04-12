@@ -42,24 +42,29 @@ const userModel = mongoose.model('user');
 
 passport.use(
   'local',
-  new LocalStrategy(
-    { usernameField: 'username', passwordField: 'password' },
-    (username, password, done) => {
-      userModel.findOne({ username }, (err, user) => {
-        if (err) return done('Error during request.', null);
-        if (!user) return done(null, false);
-        user.comparePasswords(password, (error, isMatch) => {
-          if (error) return done(error, false);
-          if (!isMatch) return done(null, false);
-          return done(null, user);
-        });
+  new LocalStrategy({ usernameField: 'username', passwordField: 'password' }, async function (
+    username,
+    password,
+    done,
+  ) {
+    try {
+      const user = await userModel.findOne({ username });
+      if (!user) return done(null, false);
+
+      user.comparePasswords(password, function (error, isMatch) {
+        if (error) return done(error, false);
+        if (!isMatch) return done(null, false);
+        return done(null, user);
       });
-    },
-  ),
+    } catch (err) {
+      console.log(err);
+      return done('Error during request.', null);
+    }
+  }),
 );
 
 passport.serializeUser((user, done) => {
-  if (!user) return done('No user provided', null);
+  if (!user) return done('No user provid  ed', null);
   return done(null, user);
 });
 
@@ -83,6 +88,17 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(async function (req, res, next) {
+  const categories = await models.category.find();
+  const stores = await models.store.distinct('name');
+  res.locals = {
+    req,
+    categories,
+    stores,
+  };
+  next();
+});
+
 app.use('/admin', ensureAdmin, require('./routes/admin.routes'));
 app.use('/browse', require('./routes/browse.routes'));
 app.use('/user', require('./routes/user.routes'));
@@ -94,12 +110,10 @@ const models = {
 };
 
 app.get('/', async (req, res) => {
-  const categories = await models.category.find();
-  const stores = await models.store.distinct('name');
   const newestBooks = await models.book.find().sort({ publicationDate: -1 });
   const topBooks = await models.book.find().sort({ rating: -1 }).limit(3);
 
-  return res.render('index', { categories, stores, newestBooks, topBooks });
+  return res.render('index', { newestBooks, topBooks });
 });
 
 app.listen(port, () => {

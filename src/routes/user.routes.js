@@ -19,43 +19,93 @@ const templates = {
 
 const router = express.Router();
 
-router.get('/login', async (req, res) => {
-  const categories = await models.category.find();
-  const stores = await models.store.distinct('name');
+router.get('/login', ensureNotAuthenticated, csrfProtection, async (req, res) => {
+  return res.render(templates.login, {
+    csrfToken: req.csrfToken(),
+    error: null,
+  });
+});
 
-  return res.render(templates.login, { categories, stores });
+router.post('/login', ensureNotAuthenticated, csrfProtection, async (req, res, next) => {
+  const { username, password } = req.body;
+
+  let error;
+
+  if (username && password) {
+    passport.authenticate('local', (err, user) => {
+      if (err) {
+        console.log(err);
+        error = 'Internal server error';
+        return res.render(templates.login, {
+          csrfToken: req.csrfToken(),
+          error,
+        });
+      }
+
+      req.logIn(user, (err) => {
+        if (err) {
+          error = 'Invalid credentials';
+          return res.render(templates.login, {
+            csrfToken: req.csrfToken(),
+            error,
+          });
+        }
+        return res.render('/', {
+          csrfToken: req.csrfToken(),
+          error: null,
+        });
+      });
+    })(req, res, next);
+  } else {
+    error = 'Username or password not provided.';
+    return res.render(templates.login, {
+      csrfToken: req.csrfToken(),
+      error,
+    });
+  }
 });
 
 router.get('/reg', ensureNotAuthenticated, csrfProtection, async (req, res) => {
-  const categories = await models.category.find();
-  const stores = await models.store.distinct('name');
-
-  return res.render(templates.reg, { categories, stores, csrfToken: req.csrfToken(), error: null });
+  return res.render(templates.reg, { csrfToken: req.csrfToken(), error: null });
 });
 
 router.post('/reg', csrfProtection, async (req, res) => {
   const { passwordConfirmation, firstName, lastName, ...body } = req.body;
 
-  const categories = await models.category.find();
-  const stores = await models.store.distinct('name');
-
   let error;
-  const newUser = new models.user({
-    ...body,
-    name: {
-      firstName,
-      lastName,
-    },
-  });
+  if (body.password === passwordConfirmation) {
+    const newUser = new models.user({
+      ...body,
+      name: {
+        firstName,
+        lastName,
+      },
+    });
 
-  try {
-    await newUser.save();
-  } catch (err) {
-    error = 'Error: ' + err.message;
-    return res.render(templates.reg, { categories, stores, csrfToken: req.csrfToken(), error });
+    try {
+      await newUser.save();
+    } catch (err) {
+      error = err.message;
+      return res.render(templates.reg, { csrfToken: req.csrfToken(), error });
+    }
+  } else {
+    error = 'The two given passwords do not match.';
+    return res.render(templates.reg, { csrfToken: req.csrfToken(), error });
   }
 
-  return res.render(templates.login, { categories, stores, csrfToken: req.csrfToken() });
+  return res.render(templates.login, { csrfToken: req.csrfToken(), error });
+});
+
+router.get('/logout', ensureAuthenticated, csrfProtection, (req, res) => {
+  let error;
+  let msg;
+  req.logout((err) => {
+    if (err) {
+      error = 'Hiba a kijelentkezés során';
+      return res.render(templates.login, { csrfToken: req.csrfToken(), error });
+    }
+    return res.render(templates.login, { csrfToken: req.csrfToken(), error: null });
+  });
 });
 
 module.exports = router;

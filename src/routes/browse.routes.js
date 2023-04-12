@@ -23,10 +23,8 @@ router.post('/', async (req, res) => {
   const books = await models.book.find({
     $or: [{ title: { $regex: data } }, { 'authors.name': { $regex: data } }],
   });
-  const categories = await models.category.find();
-  const stores = await models.store.distinct('name');
 
-  return res.render(templates.books, { books, categories, stores, catName, storeName });
+  return res.render(templates.books, { books, catName, storeName });
 });
 
 router.get('/cat/:name', async (req, res) => {
@@ -56,10 +54,7 @@ router.get('/cat/:name', async (req, res) => {
     .find({ 'categories.name': catName, price: { $gte: priceRange[0], $lte: priceRange[1] } })
     .sort(sortFilter);
 
-  const categories = await models.category.find();
-  const stores = await models.store.distinct('name');
-
-  return res.render(templates.books, { books, categories, stores, catName, storeName });
+  return res.render(templates.books, { books, catName, storeName });
 });
 
 router.get('/store/:name', async (req, res) => {
@@ -102,20 +97,15 @@ router.get('/store/:name', async (req, res) => {
     .find({ _id: { $in: bookIds }, price: { $gte: priceRange[0], $lte: priceRange[1] } })
     .sort(sortFilter);
 
-  const categories = await models.category.find();
-  const stores = await models.store.distinct('name');
-
-  return res.render(templates.books, { books, categories, stores, storeName, catName });
+  return res.render(templates.books, { books, storeName, catName });
 });
 
 router.get('/book/:id', async (req, res) => {
   const id = req.params.id;
   const book = await models.book.findById(id);
-  const categories = await models.category.find();
-  const stores = await models.store.distinct('name');
   const storeStock = await models.store.find({ 'storeStock.bookId': id }).distinct('name');
 
-  return res.render(templates.book, { book, categories, stores, storeStock });
+  return res.render(templates.book, { book, storeStock });
 });
 
 module.exports = router;

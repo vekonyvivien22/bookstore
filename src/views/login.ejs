@@ -1,41 +1,49 @@
-<%- include('header') %>
-<%- include('nav', { categories: categories, stores: stores }) %>
-	<h2 class="m-5 text-center">Sign In</h2>
-	<form class="mt-5" method="post">
-		<div class="form-group row">
-	  		<div class = "col-sm-3"></div>
-	    	<label for="inputUname" class="col-sm-2 col-form-label">Username</label>	    
-			<div class="col-sm-4">
-	      		<input type="text" class="form-control" name="username" id="inputUname" placeholder="Username">
-	    	</div>
-	  	</div>
-	  	
-	  	<div class="form-group row">
-	  		<div class = "col-sm-3"></div>
-	    	<label for="inputPassword1" class="col-sm-2 col-form-label">Password</label>
-	    	<div class="col-sm-4">
-	      		<input type="password" class="form-control" name="password" id="inputPassword1" placeholder="Password">
-	    	</div>
-	  	</div>
-	  
-	  	<div class="form-group row">
-	  		<div class = "col-sm-3"></div>
-	    	<div class="col-sm-6 text-right">
-	      		<button type="submit" class="btn btn-primary">Sign in</button>
-	    	</div>
-	  	</div>
-	</form>
-	
-	<%#<div th:if = "${errors != null}" class="alert alert-danger mr-5 ml-5 mt-5 mb-5" role="alert">
-		<h4 class="alert-heading">Unsuccessful login!</h4>
-	  	<p th:each="error : ${errors}" th:text="${error}"></p>
-	</div>%>
-	
-	<div class="text-center mb-5">
-		<a href="/user/reg">Don't have an account? Create one!</a>
-	</div>
-		
-	<script src = "js/jquery.min.js"></script>
-	<script src = "js/bootstrap.min.js"></script>
+<%- include('header') %> <%- include('nav', { categories: categories, stores: stores }) %>
+<h2 class="m-5 text-center">Sign In</h2>
+<form class="mt-5" method="post" action="/user/login">
+  <%- include('alert') %>
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+  <div class="form-group row">
+    <div class="col-sm-3"></div>
+    <label for="inputUsername" class="col-sm-2 col-form-label">Username</label>
+    <div class="col-sm-4">
+      <input
+        type="text"
+        class="form-control"
+        name="username"
+        id="inputUsername"
+        placeholder="Username"
+      />
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-sm-3"></div>
+    <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
+    <div class="col-sm-4">
+      <input
+        type="password"
+        class="form-control"
+        name="password"
+        id="inputPassword"
+        placeholder="Password"
+      />
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <div class="col-sm-3"></div>
+    <div class="col-sm-6 text-right">
+      <button type="submit" class="btn btn-primary">Sign in</button>
+    </div>
+  </div>
+</form>
+
+<div class="text-center mb-5">
+  <a href="/user/reg">Don't have an account? Create one!</a>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
 
 <%- include('footer') %>
