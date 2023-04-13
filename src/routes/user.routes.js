@@ -10,11 +10,13 @@ const models = {
   category: mongoose.model('category'),
   store: mongoose.model('store'),
   user: mongoose.model('user'),
+  book: mongoose.model('book'),
 };
 
 const templates = {
   login: 'login',
   reg: 'reg',
+  cart: 'cart',
 };
 
 const router = express.Router();
@@ -42,7 +44,7 @@ router.post('/login', ensureNotAuthenticated, csrfProtection, async (req, res, n
         });
       }
 
-      req.logIn(user, (err) => {
+      req.logIn(user, async (err) => {
         if (err) {
           error = 'Invalid credentials';
           return res.render(templates.login, {
@@ -50,10 +52,10 @@ router.post('/login', ensureNotAuthenticated, csrfProtection, async (req, res, n
             error,
           });
         }
-        return res.render('/', {
-          csrfToken: req.csrfToken(),
-          error: null,
-        });
+        const newestBooks = await models.book.find().sort({ publicationDate: -1 });
+        const topBooks = await models.book.find().sort({ rating: -1 }).limit(3);
+        //console.log(topBooks);
+        return res.render('./', { newestBooks, topBooks });
       });
     })(req, res, next);
   } else {
@@ -98,7 +100,6 @@ router.post('/reg', csrfProtection, async (req, res) => {
 
 router.get('/logout', ensureAuthenticated, csrfProtection, (req, res) => {
   let error;
-  let msg;
   req.logout((err) => {
     if (err) {
       error = 'Hiba a kijelentkezés során';
@@ -106,6 +107,10 @@ router.get('/logout', ensureAuthenticated, csrfProtection, (req, res) => {
     }
     return res.render(templates.login, { csrfToken: req.csrfToken(), error: null });
   });
+});
+
+router.get('/cart', ensureAuthenticated, csrfProtection, (req, res) => {
+  return res.render(templates.cart, { csrfToken: req.csrfToken(), error: null });
 });
 
 module.exports = router;

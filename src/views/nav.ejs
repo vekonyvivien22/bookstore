@@ -35,11 +35,11 @@
           </div>
         </li>
 
-        <% if (req.isNotAuthenticated) { %>
+        <% if (req.isAuthenticated()) { %>
         <li th:if="${user != null} AND ${user.admin != 1}" class="nav-item">
           <a class="nav-link" href="/user/cart">Cart</a>
         </li>
-        <% } %> <% if (req.isNotAuthenticated) { %>
+        <% } %> <% if (req.isAuthenticated() && req.user.isAdmin) { %>
         <li th:if="${user != null} AND ${user.admin == 1}" class="nav-item">
           <a class="nav-link" href="/admin">Dashboard</a>
         </li>
