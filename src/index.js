@@ -37,6 +37,7 @@ require('./schemas/book.schema');
 require('./schemas/category.schema');
 require('./schemas/store.schema');
 require('./schemas/user.schema');
+require('./schemas/order.schema');
 
 const userModel = mongoose.model('user');
 

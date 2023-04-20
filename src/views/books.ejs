@@ -75,7 +75,7 @@
 		      	<span><span><%= book.price %></span> Ft</span> 
 		      </td>
 		      <td>
-		      	<a class="btn btn-primary" href="#" role="button" th:href="@{/add{id}(id=${book.id})}">Add to cart!</a> 
+		      	<a class="btn btn-primary" role="button" href="/user/add/<%=book.id%>">Add to cart!</a> 
 		      </td>
 		    </tr>
 			<% }); %>

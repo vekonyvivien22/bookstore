@@ -73,10 +73,10 @@ router.post(
 );
 
 //KAtegoriak letrehozasahoz hasznaltam
-router.post( '/categories', async (req, res) => {
-  const { name} = req.body;
+router.post('/categories', async (req, res) => {
+  const { name } = req.body;
   const newCat = new models.category({
-    name
+    name,
   });
 
   try {
@@ -86,23 +86,20 @@ router.post( '/categories', async (req, res) => {
     console.log(error);
     return res.send('szia nem sikerult kategoriat letreghozni');
   }
-},
-);
+});
 
 // Boltok leterhozasahoz hasznaltam
-router.post( '/stores', async (req, res) => {
-  const {
-    name, 
-    location,
-    storeStock
-  } = req.body;
-  const asd = storeStock.split(";").map((book) => {
+router.post('/stores', async (req, res) => {
+  const { name, location, storeStock } = req.body;
+  const asd = storeStock.split(';').map((book) => {
     const [bookId, quantity] = book.split(',');
-    return {bookId, quantity};
+    return { bookId, quantity };
   });
   console.log(asd);
   const newStore = new models.store({
-    name, location, storeStock: asd
+    name,
+    location,
+    storeStock: asd,
   });
 
   try {
@@ -112,8 +109,6 @@ router.post( '/stores', async (req, res) => {
     console.log(error);
     return res.send('szia nem sikerult boltot letreghozni');
   }
-},
-);
-
+});
 
 module.exports = router;

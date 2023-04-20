@@ -37,7 +37,9 @@
 
         <% if (req.isAuthenticated()) { %>
         <li th:if="${user != null} AND ${user.admin != 1}" class="nav-item">
-          <a class="nav-link" href="/user/cart">Cart</a>
+          <a class="nav-link" href="/user/cart">
+            Cart <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+          </a>
         </li>
         <% } %> <% if (req.isAuthenticated() && req.user.isAdmin) { %>
         <li th:if="${user != null} AND ${user.admin == 1}" class="nav-item">

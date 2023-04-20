@@ -5,12 +5,14 @@ const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
 const passport = require('passport');
 const { ensureAuthenticated, ensureNotAuthenticated } = require('../utils/middlewares');
+var Cart = require('../schemas/cart');
 
 const models = {
   category: mongoose.model('category'),
   store: mongoose.model('store'),
   user: mongoose.model('user'),
   book: mongoose.model('book'),
+  order: mongoose.model('order'),
 };
 
 const templates = {
@@ -52,10 +54,7 @@ router.post('/login', ensureNotAuthenticated, csrfProtection, async (req, res, n
             error,
           });
         }
-        const newestBooks = await models.book.find().sort({ publicationDate: -1 });
-        const topBooks = await models.book.find().sort({ rating: -1 }).limit(3);
-        //console.log(topBooks);
-        return res.render('./', { newestBooks, topBooks });
+        return res.redirect('/');
       });
     })(req, res, next);
   } else {
@@ -105,12 +104,77 @@ router.get('/logout', ensureAuthenticated, csrfProtection, (req, res) => {
       error = 'Hiba a kijelentkezés során';
       return res.render(templates.login, { csrfToken: req.csrfToken(), error });
     }
-    return res.render(templates.login, { csrfToken: req.csrfToken(), error: null });
+    return res.redirect('/user/login');
   });
 });
 
 router.get('/cart', ensureAuthenticated, csrfProtection, (req, res) => {
-  return res.render(templates.cart, { csrfToken: req.csrfToken(), error: null });
+  var cart = new Cart(req.session.cart ? req.session.cart : {});
+  //console.log(cart.generateArray());
+  console.log(req.session.cart);
+
+  return res.render(templates.cart, {
+    cart: cart.generateArray(),
+    totalQty: cart.totalQty,
+    totalPrice: cart.totalPrice,
+    csrfToken: req.csrfToken(),
+    error: null,
+  });
+});
+
+router.get('/add/:id', ensureAuthenticated, csrfProtection, async (req, res) => {
+  const id = req.params.id;
+  const book = await models.book.findById(id);
+
+  var cart = new Cart(req.session.cart ? req.session.cart : {});
+  cart.add(book, id);
+  req.session.cart = cart;
+
+  //console.log(req.session.cart);
+  //console.log(req.session.cart.totalQty);
+
+  res.status(204).send();
+});
+
+router.get('/sub/:id', ensureAuthenticated, csrfProtection, async (req, res) => {
+  const id = req.params.id;
+  const book = await models.book.findById(id);
+
+  var cart = new Cart(req.session.cart ? req.session.cart : {});
+  cart.sub(book, id);
+  req.session.cart = cart;
+
+  //console.log(req.session.cart.totalQty);
+
+  res.status(204).send();
+});
+
+router.post('/order', ensureAuthenticated, csrfProtection, async (req, res) => {
+  //const { firstName, lastName, address, paymentMethod, shippingMethod, total ...body } = req.body;
+  let error;
+  console.log(req.body);
+
+  //SIMA 3 bolt esetén:
+  //Ha a store pickup van akkor: van e ott mind? error ha nincs
+  //Ha home delivery akkor: oké.
+
+  //TÖBB bolt esetén!
+  //ha home delivery akkor a raktáras stock-ot nézzük csak (mindnél)
+  //store pickupnál esetben csak a boltot
+
+  //storeStock levonás!
+  //order mentése
+
+  delete req.session.cart;
+  var cart = new Cart(req.session.cart ? req.session.cart : {});
+
+  return res.render(templates.cart, {
+    cart: cart.generateArray(),
+    totalQty: cart.totalQty,
+    totalPrice: cart.totalPrice,
+    csrfToken: req.csrfToken(),
+    error: null,
+  });
 });
 
 module.exports = router;
