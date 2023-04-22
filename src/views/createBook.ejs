@@ -1,0 +1,165 @@
+<%- include('header') %> <%- include('nav', { categories: categories, stores: stores }) %>
+<header class="mt-5 mb-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-10">
+        <h1>
+          <span><i style="font-size: 32px" class="fas">&#xf013;</i></span> Dashboard
+          <small>Create Content</small>
+        </h1>
+      </div>
+      <div id="create-button" class="col-md-2">
+        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Add Book</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="main" class="mb-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header main-color-bg bg-dark text-white">
+            <h4 class="panel-title">Add Book</h4>
+          </div>
+          <form method="post" action="/addBook">
+            <div class="container">
+              <div class="row mt-4 text-center">
+                <div id="place_for_pic" class="col-md-12">
+                  <img src="img/default.jpg" />
+                  <div class="mt-4">
+                    <label for="">Choose a picture: </label>
+                    <input type="file" name="bookPicture" id="bookpicture" class="hidden" />
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-5">
+                <div class="col-md-6">
+                  <h5 id="createcontent">Book details:</h5>
+                  <div class="form-group">
+                    <div class="col-lg-12">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="title"
+                        placeholder="Title"
+                        name="title"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-lg-12">
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="date"
+                        placeholder="Publication date"
+                        name="date"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-lg-12">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="size"
+                        placeholder="Size of the book"
+                        name="size"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-lg-12">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="binding"
+                        placeholder="Binding of the book"
+                        name="binding"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-lg-12">
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="pages"
+                        placeholder="Number of pages"
+                        name="pages"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <h5 id="create_content">Author:</h5>
+                  <div class="form-group">
+                    <div class="col-lg-12">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="author"
+                        placeholder="Name"
+                        name="author"
+                      />
+                    </div>
+                  </div>
+
+                  <h5 id="create_content">Publisher:</h5>
+                  <div class="form-group">
+                    <div class="col-lg-12">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="publisher"
+                        placeholder="Name"
+                        name="publisher"
+                      />
+                    </div>
+                  </div>
+
+                  <h5 id="create_content">Price:</h5>
+                  <div class="form-group">
+                    <div class="col-lg-12">
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="price"
+                        placeholder="Price"
+                        name="price"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-5">
+                <div id="about_form" class="form-group col-md-12">
+                  <h5>Description:</h5>
+                  <textarea
+                    class="form-control"
+                    id="exampleFormControlTextarea1"
+                    rows="5"
+                    name="description"
+                  ></textarea>
+                </div>
+              </div>
+              <div class="row mt-5">
+                <div class="text-center col-md-12">
+                  <button type="submit" class="btn btn-dark">Add</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+<%- include('footer') %>

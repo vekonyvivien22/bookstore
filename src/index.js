@@ -100,7 +100,8 @@ app.use(async function (req, res, next) {
   next();
 });
 
-app.use('/admin', ensureAdmin, require('./routes/admin.routes'));
+//app.use('/admin', ensureAdmin, require('./routes/admin.routes'));
+app.use('/admin', require('./routes/admin.routes'));
 app.use('/browse', require('./routes/browse.routes'));
 app.use('/user', require('./routes/user.routes'));
 

@@ -1,0 +1,100 @@
+<%- include('header') %> <%- include('nav', { categories: categories, stores: stores }) %>
+
+<header class="mt-5 mb-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-10">
+        <h1>
+          <span><i style="font-size: 32px" class="fas">&#xf013;</i></span> Dashboard
+          <small> Manage Your Site</small>
+        </h1>
+      </div>
+      <div id="create-button" class="col-md-2">
+        <a href="/admin/createBook" class="btn btn-secondary my-2 my-sm-0 text-white"> Add Book </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="main" class="mb-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="list-group">
+          <a href="/admin" class="list-group-item active list-group-item-action bg-dark"
+            ><i style="font-size: 18px" class="fas">&#xf013;</i> Dashboard</a
+          >
+          <a href="/admin/manageBooks" class="list-group-item list-group-item-action"
+            ><i style="font-size: 18px" class="fas">&#xf02d;</i> Books
+            <span class="badge badge-secondary"><%= books.length %></span></a
+          >
+          <a href="/admin/manageUsers" class="list-group-item list-group-item-action"
+            ><i style="font-size: 18px" class="fas">&#xf2bd;</i> Users
+            <span class="badge badge-secondary"><%= users.length %></span></a
+          >
+        </div>
+      </div>
+
+      <div class="col-md-9">
+        <div class="card">
+          <div class="card-header main-color-bg bg-dark text-white">
+            <h4 class="panel-title">Website Overview</h4>
+          </div>
+          <div class="card-body">
+            <div class="container">
+              <div class="row">
+                <div class="col-md-6 text-center">
+                  <div class="card dash-box">
+                    <h2>
+                      <%= books.length %>
+                      <span style="font-size: 32px" class="fas">&#xf02d;</span>
+                    </h2>
+                    <h4>Books</h4>
+                  </div>
+                </div>
+                <div class="col-md-6 text-center">
+                  <div class="card dash-box">
+                    <h2>
+                      <%= users.length %>
+                      <span><i style="font-size: 32px" class="fas">&#xf2bd;</i></span>
+                    </h2>
+                    <h4>Users</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="latest-users" class="card mt-4">
+          <div class="card-header main-color-bg bg-dark text-white">
+            <h4 class="panel-title">Latest Users</h4>
+          </div>
+          <div class="card-body">
+            <div class="container">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Usersname</th>
+                    <th>Email</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="user : ${latestUsers}">
+                    <td th:text="${user.getUsername()}"></td>
+                    <td th:text="${user.getEmail()}"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<%- include('footer') %>

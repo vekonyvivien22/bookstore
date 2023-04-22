@@ -101,7 +101,7 @@ router.get('/logout', ensureAuthenticated, csrfProtection, (req, res) => {
   let error;
   req.logout((err) => {
     if (err) {
-      error = 'Hiba a kijelentkezés során';
+      error = 'Error during checkout.';
       return res.render(templates.login, { csrfToken: req.csrfToken(), error });
     }
     return res.redirect('/user/login');
@@ -111,7 +111,7 @@ router.get('/logout', ensureAuthenticated, csrfProtection, (req, res) => {
 router.get('/cart', ensureAuthenticated, csrfProtection, (req, res) => {
   var cart = new Cart(req.session.cart ? req.session.cart : {});
   //console.log(cart.generateArray());
-  console.log(req.session.cart);
+  //console.log(req.session.cart);
 
   return res.render(templates.cart, {
     cart: cart.generateArray(),
@@ -157,46 +157,64 @@ router.get('/sub/:id', ensureAuthenticated, csrfProtection, async (req, res) => 
 });
 
 router.post('/order', ensureAuthenticated, csrfProtection, async (req, res) => {
-  const { shippingMethod, storeSelect, ...body } = req.body;
+  const { firstName, lastName, address, paymentMethod, shippingMethod, storeSelect, total } =
+    req.body;
+  var saveAddress = address;
   var cart = new Cart(req.session.cart ? req.session.cart : {});
   let error;
 
-  if (shippingMethod == 'store pickup') {
-    //console.log(storeSelect);
-    try {
-      for (const book of cart.generateArray()) {
-        //console.log('Book id:' + book.item._id + ', qty:' + book.qty);
-        const store = await models.store.find(
-          { name: storeSelect },
-          { 'storeStock.bookId': book.item._id },
-          //{ 'storeStock.quantity': { $gte: book.qty } },
-        );
-        console.log(store);
+  try {
+    for (const book of cart.generateArray()) {
+      const store = await models.store.findOne({
+        ...(shippingMethod === 'store pickup' && { name: storeSelect }),
+        storeStock: { $elemMatch: { quantity: { $gte: book.qty }, bookId: book.item._id } },
+      });
+
+      if (!store) {
+        if (shippingMethod === 'store pickup') {
+          throw new Error('One/some of the books are out of stock (in the selected store)');
+        } else if (shippingMethod === 'home delivery')
+          throw new Error('One/some of the books are completely out of stock (in every store).');
+      } else {
+        if (shippingMethod === 'store pickup')
+          saveAddress = store.location + ' (' + storeSelect + ')';
       }
-    } catch (err) {
-      error = 'Az egyik könyv nincs a boltnak raktárán vagy nincs elég.';
+
+      await models.store.updateOne(
+        { _id: store._id, 'storeStock.bookId': book.item._id },
+        { $inc: { 'storeStock.$.quantity': -book.qty } },
+      );
+
+      const newOrder = new models.order({
+        userID: req.user._id,
+        paymentMethod,
+        shippingName: {
+          firstName,
+          lastName,
+        },
+        shippingMethod,
+        shippingAddress: saveAddress,
+        total,
+        items: Object.entries(cart.items).map(([key, item]) => ({
+          bookId: key,
+          quantity: item.qty,
+        })),
+      });
+
+      await newOrder.save();
+
+      delete req.session.cart;
     }
-    console.log('helo');
-  } else {
-    console.log('szia');
+  } catch (err) {
+    error = err;
   }
-
-  //SIMA 3 bolt esetén:
-  //Ha a store pickup van akkor: van e ott mind? error ha nincs
-  //Ha home delivery akkor: oké.
-
-  //storeStock levonás!
-  //order mentése
-
-  delete req.session.cart;
-  var cart = new Cart(req.session.cart ? req.session.cart : {});
 
   return res.render(templates.cart, {
     cart: cart.generateArray(),
     totalQty: cart.totalQty,
     totalPrice: cart.totalPrice,
     csrfToken: req.csrfToken(),
-    error: null,
+    error,
   });
 });
 

@@ -10,7 +10,7 @@ function ensureNotAuthenticated(req, res, next) {
 
 function ensureAdmin(req, res, next) {
   if (req.isAuthenticated() && req.user.isAdmin) return next();
-  return res.redirect('/images');
+  return res.redirect('/');
 }
 
 module.exports = { ensureAuthenticated, ensureNotAuthenticated, ensureAdmin };

@@ -41,11 +41,10 @@
             Cart <i class="fa fa-shopping-cart" aria-hidden="true"></i>
           </a>
         </li>
-        <% } %> <% if (req.isAuthenticated() && req.user.isAdmin) { %>
+        <% } %>
         <li th:if="${user != null} AND ${user.admin == 1}" class="nav-item">
           <a class="nav-link" href="/admin">Dashboard</a>
         </li>
-        <% } %>
       </ul>
 
       <form class="form-inline my-2 my-lg-0" method="POST" action="/browse">

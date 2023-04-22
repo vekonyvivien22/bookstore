@@ -6,13 +6,40 @@ const models = {
   book: mongoose.model('book'),
   category: mongoose.model('category'),
   store: mongoose.model('store'),
+  user: mongoose.model('user'),
 };
 
 const templates = {
   book: 'book',
+  admin: 'admin',
+  createBook: 'createBook',
+  manageBooks: 'manageBooks',
+  manageUsers: 'manageUsers',
 };
 
 const router = express.Router();
+
+router.get('/', async (_req, res) => {
+  const books = await models.book.find();
+  const users = await models.user.find();
+  return res.render(templates.admin, { books, users });
+});
+
+router.get('/createBook', async (_req, res) => {
+  return res.render(templates.createBook, {});
+});
+
+router.get('/manageBooks', async (_req, res) => {
+  const books = await models.book.find();
+  const users = await models.user.find();
+  return res.render(templates.manageBooks, { books, users });
+});
+
+router.get('/manageUsers', async (_req, res) => {
+  const books = await models.book.find();
+  const users = await models.user.find();
+  return res.render(templates.manageUsers, { books, users });
+});
 
 /*router.get('/books', async (_req, res) => {
   // const books = await models.book.find({authors: {$in: ['James', "Pali"]}});
