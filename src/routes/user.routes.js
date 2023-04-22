@@ -130,10 +130,13 @@ router.get('/add/:id', ensureAuthenticated, csrfProtection, async (req, res) => 
   cart.add(book, id);
   req.session.cart = cart;
 
-  //console.log(req.session.cart);
-  //console.log(req.session.cart.totalQty);
-
-  res.status(204).send();
+  req.session.save(function () {
+    if (req.get('referer').includes('/user/cart')) {
+      return res.redirect('/user/cart');
+    } else {
+      return res.status(204).send();
+    }
+  });
 });
 
 router.get('/sub/:id', ensureAuthenticated, csrfProtection, async (req, res) => {
@@ -144,23 +147,43 @@ router.get('/sub/:id', ensureAuthenticated, csrfProtection, async (req, res) => 
   cart.sub(book, id);
   req.session.cart = cart;
 
-  //console.log(req.session.cart.totalQty);
-
-  res.status(204).send();
+  req.session.save(function () {
+    if (req.get('referer').includes('/user/cart')) {
+      return res.redirect('/user/cart');
+    } else {
+      return res.status(204).send();
+    }
+  });
 });
 
 router.post('/order', ensureAuthenticated, csrfProtection, async (req, res) => {
-  //const { firstName, lastName, address, paymentMethod, shippingMethod, total ...body } = req.body;
+  const { shippingMethod, storeSelect, ...body } = req.body;
+  var cart = new Cart(req.session.cart ? req.session.cart : {});
   let error;
-  console.log(req.body);
+
+  if (shippingMethod == 'store pickup') {
+    //console.log(storeSelect);
+    try {
+      for (const book of cart.generateArray()) {
+        //console.log('Book id:' + book.item._id + ', qty:' + book.qty);
+        const store = await models.store.find(
+          { name: storeSelect },
+          { 'storeStock.bookId': book.item._id },
+          //{ 'storeStock.quantity': { $gte: book.qty } },
+        );
+        console.log(store);
+      }
+    } catch (err) {
+      error = 'Az egyik könyv nincs a boltnak raktárán vagy nincs elég.';
+    }
+    console.log('helo');
+  } else {
+    console.log('szia');
+  }
 
   //SIMA 3 bolt esetén:
   //Ha a store pickup van akkor: van e ott mind? error ha nincs
   //Ha home delivery akkor: oké.
-
-  //TÖBB bolt esetén!
-  //ha home delivery akkor a raktáras stock-ot nézzük csak (mindnél)
-  //store pickupnál esetben csak a boltot
 
   //storeStock levonás!
   //order mentése
