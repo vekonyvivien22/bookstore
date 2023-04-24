@@ -19,6 +19,8 @@ const templates = {
 
 const router = express.Router();
 
+//  CSRFPROTECTION , ENSUREADMIN!
+
 router.get('/', async (_req, res) => {
   const books = await models.book.find();
   const users = await models.user.find();
@@ -41,19 +43,9 @@ router.get('/manageUsers', async (_req, res) => {
   return res.render(templates.manageUsers, { books, users });
 });
 
-/*router.get('/books', async (_req, res) => {
-  // const books = await models.book.find({authors: {$in: ['James', "Pali"]}});
-
-  const books = await models.book.find();
-  const categories = await models.category.find();
-  const stores = await models.store.find();
-
-  return res.render('index', { random: 'hello szia' });
-});*/
-
-//Könyvek létrehozásához
+//CREATE BOOK
 router.post(
-  '/books/create',
+  '/createBook',
   Multer({ storage: Multer.memoryStorage() }).single('image'),
   async (req, res) => {
     const {
@@ -99,8 +91,8 @@ router.post(
   },
 );
 
-//KAtegoriak letrehozasahoz hasznaltam
-router.post('/categories', async (req, res) => {
+//CREATE CATEGORY
+router.post('/createCategory', async (req, res) => {
   const { name } = req.body;
   const newCat = new models.category({
     name,
@@ -115,8 +107,8 @@ router.post('/categories', async (req, res) => {
   }
 });
 
-// Boltok leterhozasahoz hasznaltam
-router.post('/stores', async (req, res) => {
+// CREATE STORE
+router.post('/createStore', async (req, res) => {
   const { name, location, storeStock } = req.body;
   const asd = storeStock.split(';').map((book) => {
     const [bookId, quantity] = book.split(',');
@@ -136,6 +128,24 @@ router.post('/stores', async (req, res) => {
     console.log(error);
     return res.send('szia nem sikerult boltot letreghozni');
   }
+});
+
+router.get('/delUser/:id', async (req, res) => {
+  const id = req.params.id;
+
+  await models.user.deleteOne({ _id: id });
+
+  return res.redirect('/admin/manageUsers');
+});
+
+router.get('/delBook/:id', async (req, res) => {
+  const id = req.params.id;
+
+  await models.book.deleteOne({ _id: id });
+
+  await models.store.update({ $pull: { storeStock: { bookId: id } } });
+
+  return res.redirect('/admin/manageBooks');
 });
 
 module.exports = router;

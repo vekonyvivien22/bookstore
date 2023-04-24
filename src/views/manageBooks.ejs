@@ -57,7 +57,7 @@
                     <td><%= i+1 %></td>
                     <td><%= book.title %></td>
                     <td>
-                      <a class="btn btn-danger" th:href="@{/delBook{id}(id=${book.getId()})}"
+                      <a class="btn btn-danger" href="/admin/delBook/<%=book.id%>"
                         >Delete</a
                       >
                     </td>
