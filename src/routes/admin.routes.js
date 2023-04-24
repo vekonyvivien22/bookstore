@@ -60,7 +60,7 @@ router.post(
       categories,
     } = req.body;
     console.log(req.body);
-    console.log(req.file.originalname);
+    console.log(req.file);
     const newBook = new models.book({
       title,
       description,
@@ -86,7 +86,7 @@ router.post(
       return res.send(createdBook);
     } catch (error) {
       console.log(error);
-      return res.send('szia nem sikerult');
+      return res.send('szia nem sikerult könyvet létrehozni');
     }
   },
 );
