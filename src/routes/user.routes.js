@@ -1,6 +1,5 @@
 const express = require('express');
 const { default: mongoose } = require('mongoose');
-const Multer = require('multer');
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: true });
 const passport = require('passport');
@@ -70,7 +69,7 @@ router.get('/reg', ensureNotAuthenticated, csrfProtection, async (req, res) => {
   return res.render(templates.reg, { csrfToken: req.csrfToken(), error: null });
 });
 
-router.post('/reg', csrfProtection, async (req, res) => {
+router.post('/reg', ensureNotAuthenticated, csrfProtection, async (req, res) => {
   const { passwordConfirmation, firstName, lastName, ...body } = req.body;
 
   let error;

@@ -23,14 +23,15 @@
           <div class="card-header main-color-bg bg-dark text-white">
             <h4 class="panel-title">Add Book</h4>
           </div>
-          <form method="post" action="/admin/createBook">
+          <form method="post" action="/admin/createBook" enctype="multipart/form-data">
+            <!--<input type="hidden" name="_csrf" value="<%= csrfToken %>" />-->
             <div class="container">
               <div class="row mt-4 text-center">
                 <div id="place_for_pic" class="col-md-12">
                   <img src="img/default.jpg" />
                   <div class="mt-4">
                     <label for="">Choose a picture: </label>
-                    <input type="file" name="image" id="image" class="hidden" />
+                    <input type="file" name="image" id="image" />
                   </div>
                 </div>
               </div>
