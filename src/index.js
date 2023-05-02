@@ -8,7 +8,8 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const expressSession = require('express-session');
 const MongoStore = require('connect-mongo');
-const { ensureAdmin } = require('./utils/middlewares');
+const { ensureAdmin, ensureAuthenticated } = require('./utils/middlewares');
+const moment = require('moment/moment');
 
 const app = express();
 
@@ -100,8 +101,7 @@ app.use(async function (req, res, next) {
   next();
 });
 
-//app.use('/admin', ensureAdmin, require('./routes/admin.routes'));
-app.use('/admin', require('./routes/admin.routes'));
+app.use('/admin', ensureAdmin, require('./routes/admin.routes'));
 app.use('/browse', require('./routes/browse.routes'));
 app.use('/user', require('./routes/user.routes'));
 
@@ -109,13 +109,58 @@ const models = {
   book: mongoose.model('book'),
   category: mongoose.model('category'),
   store: mongoose.model('store'),
+  order: mongoose.model('order'),
 };
 
-app.get('/', async (req, res) => {
+app.get('/', async (_req, res) => {
   const newestBooks = await models.book.find().sort({ publicationDate: -1 });
   const topBooks = await models.book.find().sort({ rating: -1 }).limit(3);
 
-  return res.render('index', { newestBooks, topBooks });
+  const ordersOfTheMonth = await models.order.find({
+    $expr: {
+      $and: [
+        { $eq: [{ $month: '$createdAt' }, new Date().getMonth() + 1] },
+        { $eq: [{ $year: '$createdAt' }, new Date().getFullYear()] },
+      ],
+    },
+  });
+
+  const ordersOfTheWeek = await models.order.find({
+    createdAt: {
+      $gte: moment().startOf('isoweek').toDate(),
+      $lt: moment().endOf('isoweek').toDate(),
+    },
+  });
+
+  function getTop3BookIds(param) {
+    const map = new Map();
+    const bookIds = [];
+    for (var order in param) {
+      for (const item of param[order].items) {
+        //console.log(order + 'order -> ' + item.bookId + ' : ' + item.quantity);
+        let prevQuantity = map.get(item.bookId);
+        //console.log('Prev quantity -> ' + prevQuantity);
+        map.set(item.bookId, prevQuantity ? prevQuantity + item.quantity : item.quantity);
+      }
+    }
+
+    const sorted = [...map.entries()].sort((a, b) => b[1] - a[1]);
+
+    for (let i = 0; i < 3; i++) {
+      if (sorted[i]) bookIds.push(new mongoose.Types.ObjectId(sorted[i][0]));
+    }
+
+    return bookIds;
+  }
+
+  const booksOfTheMonth = await models.book.find({
+    _id: { $in: getTop3BookIds(ordersOfTheMonth) },
+  });
+  const booksOfTheWeek = await models.book.find({
+    _id: { $in: getTop3BookIds(ordersOfTheWeek) },
+  });
+
+  return res.render('index', { newestBooks, topBooks, booksOfTheMonth, booksOfTheWeek });
 });
 
 app.listen(port, () => {

@@ -70,25 +70,52 @@
           <div class="card-header main-color-bg bg-dark text-white">
             <h4 class="panel-title">Regular Users</h4>
           </div>
-          <div class="card-body">
-            <div class="container">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Usersname</th>
-                    <th>Email</th>
-                    <th>Discount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr th:each="user : ${latestUsers}">
-                    <td th:text="${user.getUsername()}"></td>
-                    <td th:text="${user.getEmail()}"></td>
-                  </tr>
-                </tbody>
-              </table>
+          <form class="needs-validation" method="post" action="/admin/modUser">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <div class="card-body">
+              <div class="container">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Usersname</th>
+                      <th>Email</th>
+                      <th>Discount (%)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% regUsers.forEach(function(user, i){ %>
+                    <tr>
+                      <td>
+                        <input
+                          type="hidden"
+                          id="username"
+                          value="<%= user.username %>"
+                          name="username"
+                        /><%= user.username %>
+                      </td>
+                      <td><%=user.email %></td>
+                      <td>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="discount"
+                          value="<%= user.regularUser.discount %>"
+                          required=""
+                          name="discount"
+                        />
+                      </td>
+                    </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+                <div class="text-center">
+                  <button href="" class="btn btn-secondary my-2 my-sm-0 text-white align-middle">
+                    Modify</a
+                  >
+                </div>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>

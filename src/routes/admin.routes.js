@@ -22,12 +22,13 @@ const templates = {
 
 const router = express.Router();
 
-//  CSRFPROTECTION , ENSUREADMIN!
+//  CSRFPROTECTION
 
-router.get('/', ensureAdmin, csrfProtection, async (_req, res) => {
+router.get('/', ensureAdmin, csrfProtection, async (req, res) => {
   const books = await models.book.find();
   const users = await models.user.find();
-  return res.render(templates.admin, { books, users });
+  const regUsers = await models.user.find({ 'regularUser.isRegular': true });
+  return res.render(templates.admin, { books, users, regUsers, csrfToken: req.csrfToken() });
 });
 
 router.get('/createBook', ensureAdmin, csrfProtection, async (req, res) => {
@@ -150,6 +151,29 @@ router.get('/delBook/:id', ensureAdmin, csrfProtection, async (req, res) => {
   await models.store.updateMany({ $pull: { storeStock: { bookId: id } } });
 
   return res.redirect('/admin/manageBooks');
+});
+
+router.post('/modUser', ensureAdmin, csrfProtection, async (req, res) => {
+  const { username, discount } = req.body;
+
+  username.forEach(async function (value, i) {
+    const user = await models.user.findOne({
+      username: value,
+      'regularUser.discount': discount[i],
+    });
+
+    if (!user) {
+      try {
+        await models.user.updateOne(
+          { username: value },
+          { $set: { 'regularUser.discount': discount[i] } },
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  });
+  return res.redirect('/admin');
 });
 
 module.exports = router;

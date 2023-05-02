@@ -53,7 +53,9 @@ router.post('/login', ensureNotAuthenticated, csrfProtection, async (req, res, n
             error,
           });
         }
-        return res.redirect('/');
+        req.session.save(function () {
+          return res.redirect('/');
+        });
       });
     })(req, res, next);
   } else {
@@ -130,7 +132,7 @@ router.get('/add/:id', ensureAuthenticated, csrfProtection, async (req, res) => 
   req.session.cart = cart;
 
   req.session.save(function () {
-    if (req.get('referer').includes('/user/cart')) {
+    if (req.get('referer').includes('/user/cart') || req.get('referer').includes('/user/order')) {
       return res.redirect('/user/cart');
     } else {
       return res.status(204).send();
@@ -147,7 +149,7 @@ router.get('/sub/:id', ensureAuthenticated, csrfProtection, async (req, res) => 
   req.session.cart = cart;
 
   req.session.save(function () {
-    if (req.get('referer').includes('/user/cart')) {
+    if (req.get('referer').includes('/user/cart') || req.get('referer').includes('/user/order')) {
       return res.redirect('/user/cart');
     } else {
       return res.status(204).send();

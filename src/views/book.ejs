@@ -12,7 +12,11 @@
       <div class="p-4">
         <h1><%= book.title %></h1>
         <h5><span></span><span> <%= book.publisherName %></span></h5>
-        <h5><span></span><%= book.price %> Ft</h5>
+        <% if(req.isAuthenticated() && req.user.regularUser.isRegular) {%>
+        <h5><%= book.price %> Ft (-<%= req.user.regularUser.discount%>%)</h5>
+        <% } else {%>
+        <h5><%= book.price %> Ft</h5>
+        <% } %>
         <h5><span class="fa fa-star checked"><%= book.rating %></span></h5>
         <h3>Auhtor/s:</h3>
         <% book.authors.forEach(function(author){ %>
@@ -25,8 +29,8 @@
         </p>
 
         <span class="mt-2 mb-2"
-          >This book is available in <% storeStock.forEach(function(store){ %>
-          <span> <span><%= store %></span>, </span>
+          >This book is available in <% storeStock.forEach((values, keys) => { %>
+          <span><%= keys %> (<%= values %>), </span>
           <% }); %> </span
         ><br />
 

@@ -116,6 +116,16 @@
 	<script src = "/js/bootstrap.min.js"></script>
 	<script src="/js/form-validation.js"></script>
 	<script>
+		function createDiscount(){
+		$('#total-li').before(
+			`<li class="list-group-item d-flex justify-content-between lh-condensed">
+				<div>
+					<h6 class="my-0">Discount</h6>
+				</div>
+				<span class="text-muted">- <%= req.user.regularUser.discount%>%</span>
+			</li>`
+		);
+		};
 		function createStoreSelect() {
 		$("#store-radio-label").after(`
 			<div class="my-2" id="store-select">
@@ -129,9 +139,15 @@
 			</div>
 		`);
 		}
-		var homeDelivery = false; 
+		var homeDelivery = false;
 		createStoreSelect();
-		$('#total_price').val(<%= totalPrice%>);
+
+		if(<%=req.user.regularUser.isRegular && (cart !== null || !cart.length)%>){
+			createDiscount();
+			$('#total_price').val(<%= totalPrice -( totalPrice * req.user.regularUser.discount/100) %>);
+			$('#total-li').children('strong').text(<%= totalPrice -( totalPrice * req.user.regularUser.discount/100) %>);
+		} else {$('#total_price').val(<%= totalPrice%>);}
+		
 		$('input[type=radio][name=shippingMethod]').change(function() {
 			if (this.value == 'store pickup') {
 				createStoreSelect();
@@ -151,8 +167,13 @@
 			       			<span class="text-muted">1000</span>
 					     </li>`
 					);
-					$('#total-li').children('strong').text(<%= totalPrice  + 1000 %>);
-					$('#total_price').val(<%= totalPrice  + 1000 %>);
+					if(<%=req.user.regularUser.isRegular && (cart !== null || !cart.length)%>){
+						$('#total-li').children('strong').text(<%= totalPrice -( totalPrice * req.user.regularUser.discount/100) + 1000 %>);
+						$('#total_price').val(<%= totalPrice -( totalPrice * req.user.regularUser.discount/100) + 1000 %>);
+					} else {
+						$('#total-li').children('strong').text(<%= totalPrice  + 1000 %>);
+						$('#total_price').val(<%= totalPrice  + 1000 %>);
+					}
 				}
 			}
 		});
@@ -161,8 +182,13 @@
 				if (homeDelivery) {
 					homeDelivery = false;
 					$('#delivery-li').remove();
-					$('#total-li').children('strong').text(<%= totalPrice%>);
-					$('#total_price').val(<%= totalPrice %>);
+					if(<%=req.user.regularUser.isRegular && (cart !== null || !cart.length)%>){
+						$('#total-li').children('strong').text(<%= totalPrice -( totalPrice * req.user.regularUser.discount/100)%>);
+						$('#total_price').val(<%= totalPrice -( totalPrice * req.user.regularUser.discount/100) %>);
+					} else {
+						$('#total-li').children('strong').text(<%= totalPrice%>);
+						$('#total_price').val(<%= totalPrice %>);
+					}
 				}
 			}
 		});
