@@ -66,7 +66,7 @@
 		      <th scope="row"><%= i %></th>
 			  <% i++; %>
 		      <td>
-		      	<img id="book_img" src="data:image/<%= keys.image.contentType %>;base64,<%=keys.image.data.toString('base64') %>" style="height: 120px;" class="img-fluid float-left" alt="Responsive image">
+		      	<img id="book_img" src="<% if(keys.image.data){%>data:image/<%= keys.image.contentType %>;base64,<%=keys.image.data.toString('base64') %><% }else{%>/img/default.jpg<% }%>" style="height: 120px;" class="img-fluid float-left" alt="Responsive image">
            		<a href="/browse/book/<%=keys.id%>"><h5 id="title" style="margin-left: 100px"><%= keys.title %></h5></a>
            		<p id="nomargin" class="text-muted" style="margin-left: 100px"><%= keys.publicationDate %></p>
 		      </td>

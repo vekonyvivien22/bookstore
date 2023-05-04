@@ -22,7 +22,7 @@
         <a href="browse/book/<%=book.id%>">
           <img
             style="height: 500px; width: 337px"
-            src="data:image/<%= book.image.contentType %>;base64,<%=book.image.data.toString('base64') %>"
+            src="<% if(book.image.data){%>data:image/<%= book.image.contentType %>;base64,<%=book.image.data.toString('base64') %><% }else{%>/img/default.jpg<% }%>"
             class="d-block m-auto"
             alt="..."
           />
@@ -70,7 +70,7 @@
         <a href="browse/book/<%=book.id%>">
           <img
             style="height: 500px; width: 337px"
-            src="data:image/<%= book.image.contentType %>;base64,<%=book.image.data.toString('base64') %>"
+            src="<% if(book.image.data){%>data:image/<%= book.image.contentType %>;base64,<%=book.image.data.toString('base64') %><% }else{%>/img/default.jpg<% }%>"
             class="d-block m-auto"
             alt="..."
           />
@@ -118,7 +118,7 @@
         <a href="browse/book/<%=book.id%>">
           <img
             style="height: 500px; width: 337px"
-            src="data:image/<%= book.image.contentType %>;base64,<%=book.image.data.toString('base64') %>"
+            src="<% if(book.image.data){%>data:image/<%= book.image.contentType %>;base64,<%=book.image.data.toString('base64') %><% }else{%>/img/default.jpg<% }%>"
             class="d-block m-auto"
             alt="..."
           />
@@ -166,7 +166,7 @@
         <a href="browse/book/<%=book.id%>">
           <img
             style="height: 500px; width: 337px"
-            src="data:image/<%= book.image.contentType %>;base64,<%=book.image.data.toString('base64') %>"
+            src="<% if(book.image.data){%>data:image/<%= book.image.contentType %>;base64,<%=book.image.data.toString('base64') %><% }else{%>/img/default.jpg<% }%>"
             class="d-block m-auto"
             alt="..."
           />

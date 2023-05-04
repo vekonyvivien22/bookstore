@@ -205,15 +205,16 @@ router.post('/order', ensureAuthenticated, csrfProtection, async (req, res) => {
       await newOrder.save();
 
       delete req.session.cart;
+      cart = null;
     }
   } catch (err) {
     error = err;
   }
 
   return res.render(templates.cart, {
-    cart: cart.generateArray(),
-    totalQty: cart.totalQty,
-    totalPrice: cart.totalPrice,
+    cart: cart?.generateArray() ?? [],
+    totalQty: cart?.totalQty ?? 0,
+    totalPrice: cart?.totalPrice ?? 0,
     csrfToken: req.csrfToken(),
     error,
   });

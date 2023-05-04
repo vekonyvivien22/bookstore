@@ -1,4 +1,5 @@
-<%- include('header') %> <%- include('nav', { categories: categories, stores: stores }) %>
+<%- include('header') %> <%- include('nav', { categories: categories, stores: stores }) %> <%-
+include('alert') %>
 <header class="mt-5 mb-5">
   <div class="container">
     <div class="row">
@@ -24,7 +25,7 @@
             <h4 class="panel-title">Add Book</h4>
           </div>
           <form method="post" action="/admin/createBook" enctype="multipart/form-data">
-            <!--<input type="hidden" name="_csrf" value="<%= csrfToken %>" />-->
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <div class="container">
               <div class="row mt-4 text-center">
                 <div id="place_for_pic" class="col-md-12">

@@ -113,7 +113,7 @@ const models = {
 };
 
 app.get('/', async (_req, res) => {
-  const newestBooks = await models.book.find().sort({ publicationDate: -1 });
+  const newestBooks = await models.book.find().sort({ publicationDate: -1 }).limit(3);
   const topBooks = await models.book.find().sort({ rating: -1 }).limit(3);
 
   const ordersOfTheMonth = await models.order.find({

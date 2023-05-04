@@ -1,11 +1,11 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const bookSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     image: {
-      data: { type: Buffer, required: true },
-      contentType: { type: String, required: true },
+      data: { type: Buffer },
+      contentType: { type: String },
     },
     description: { type: String, required: true },
     publicationDate: { type: Number, required: true, max: 2023 },
@@ -26,7 +26,7 @@ const bookSchema = new mongoose.Schema(
       }),
     ],
   },
-  { collection: "books", timestamps: { createdAt: true, updatedAt: true } }
+  { collection: 'books', timestamps: { createdAt: true, updatedAt: true } },
 );
 
-mongoose.model("book", bookSchema);
+mongoose.model('book', bookSchema);

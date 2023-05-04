@@ -21,9 +21,14 @@ router.post('/', async (req, res) => {
   const storeName = 0;
   const data = req.body.data;
   //console.log(data);
-  const books = await models.book.find({
+  const bookObj = await models.book.find({
     $or: [{ title: { $regex: data } }, { 'authors.name': { $regex: data } }],
   });
+
+  const books = new Map();
+  for (const book of bookObj) {
+    books.set(book, 0);
+  }
 
   return res.render(templates.books, { books, catName, storeName });
 });

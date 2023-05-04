@@ -32,7 +32,7 @@ router.get('/', ensureAdmin, csrfProtection, async (req, res) => {
 });
 
 router.get('/createBook', ensureAdmin, csrfProtection, async (req, res) => {
-  return res.render(templates.createBook, { csrfToken: req.csrfToken() });
+  return res.render(templates.createBook, { csrfToken: req.csrfToken(), error: null });
 });
 
 router.get('/manageBooks', ensureAdmin, csrfProtection, async (_req, res) => {
@@ -51,6 +51,7 @@ router.get('/manageUsers', ensureAdmin, csrfProtection, async (_req, res) => {
 router.post(
   '/createBook',
   ensureAdmin,
+  csrfProtection,
   Multer({ storage: Multer.memoryStorage() }).single('image'),
   async (req, res) => {
     const {
@@ -65,33 +66,55 @@ router.post(
       categories,
     } = req.body;
     console.log(req.body);
-    console.log(req.file.originalname);
-    const newBook = new models.book({
-      title,
-      description,
-      image: {
-        data: req.file.buffer,
-        contentType: `image/${req.file.originalname.split('.').slice(-1)}`,
-      },
-      publicationDate,
-      numberOfPages,
-      price,
-      rating,
-      publisherName,
-      authors: authors.split(',').map((author) => {
-        return { name: author };
-      }),
-      categories: categories.split(',').map((category) => ({
-        name: category,
-      })),
-    });
+    //console.log(req.file.originalname);
+    let error;
+    let newBook;
+
+    if (!req.file) {
+      newBook = new models.book({
+        title,
+        description,
+        publicationDate,
+        numberOfPages,
+        price,
+        rating,
+        publisherName,
+        authors: authors.split(',').map((author) => {
+          return { name: author };
+        }),
+        categories: categories.split(',').map((category) => ({
+          name: category,
+        })),
+      });
+    } else {
+      newBook = new models.book({
+        title,
+        description,
+        image: {
+          data: req.file.buffer,
+          contentType: `image/${req.file.originalname.split('.').slice(-1)}`,
+        },
+        publicationDate,
+        numberOfPages,
+        price,
+        rating,
+        publisherName,
+        authors: authors.split(',').map((author) => {
+          return { name: author };
+        }),
+        categories: categories.split(',').map((category) => ({
+          name: category,
+        })),
+      });
+    }
 
     try {
       await newBook.save();
       return res.redirect('/admin/createBook');
-    } catch (error) {
-      console.log(error);
-      return res.send('szia nem sikerult könyvet létrehozni');
+    } catch (err) {
+      console.log(err);
+      error = 'Error: cannot add book to database.';
+      return res.render(templates.createBook, { csrfToken: req.csrfToken(), error });
     }
   },
 );
