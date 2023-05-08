@@ -82,7 +82,7 @@ app.use(
     saveUninitialized: true,
     store: MongoStore.create({ mongoUrl: connectionUri }),
     cookie: {
-      maxAge: 5 * 24 * 60 * 60 * 1000,
+      maxAge: 1 * 60 * 60 * 1000,
     },
   }),
 );
@@ -113,8 +113,8 @@ const models = {
 };
 
 app.get('/', async (_req, res) => {
-  const newestBooks = await models.book.find().sort({ publicationDate: -1 }).limit(3);
-  const topBooks = await models.book.find().sort({ rating: -1 }).limit(3);
+  const newestBooks = await models.book.find().sort({ publicationDate: -1 }).limit(5);
+  const topBooks = await models.book.find().sort({ rating: -1 }).limit(5);
 
   const ordersOfTheMonth = await models.order.find({
     $expr: {
@@ -125,6 +125,8 @@ app.get('/', async (_req, res) => {
     },
   });
 
+  //console.log(ordersOfTheMonth);
+
   const ordersOfTheWeek = await models.order.find({
     createdAt: {
       $gte: moment().startOf('isoweek').toDate(),
@@ -132,7 +134,7 @@ app.get('/', async (_req, res) => {
     },
   });
 
-  function getTop3BookIds(param) {
+  function getBookIds(param) {
     const map = new Map();
     const bookIds = [];
     for (var order in param) {
@@ -145,23 +147,86 @@ app.get('/', async (_req, res) => {
     }
 
     const sorted = [...map.entries()].sort((a, b) => b[1] - a[1]);
+    //console.log(sorted);
 
-    for (let i = 0; i < 3; i++) {
-      if (sorted[i]) bookIds.push(new mongoose.Types.ObjectId(sorted[i][0]));
+    for (let i = 0; i < sorted.length; i++) {
+      bookIds.push(new mongoose.Types.ObjectId(sorted[i][0]));
     }
-
+    //console.log(bookIds);
     return bookIds;
   }
 
-  const booksOfTheMonth = await models.book.find({
-    _id: { $in: getTop3BookIds(ordersOfTheMonth) },
-  });
-  const booksOfTheWeek = await models.book.find({
-    _id: { $in: getTop3BookIds(ordersOfTheWeek) },
-  });
+  const booksOfTheMonth = await models.book
+    .find({
+      _id: { $in: getBookIds(ordersOfTheMonth) },
+    })
+    .limit(5);
+
+  //console.log(booksOfTheMonth);
+
+  const booksOfTheWeek = await models.book
+    .find({
+      _id: { $in: getBookIds(ordersOfTheWeek) },
+    })
+    .limit(5);
 
   return res.render('index', { newestBooks, topBooks, booksOfTheMonth, booksOfTheWeek });
 });
+
+/*const fs = require('fs');
+const { parse } = require('csv-parse');
+
+app.get('/loadBooks', async (req, res) => {
+  fs.createReadStream('../books.csv')
+    .pipe(parse({ delimiter: ',', from_line: 2 }))
+    .on('data', async function (row) {
+      const [
+        authors,
+        categories,
+        description,
+        numberOfPages,
+        price,
+        publicationDate,
+        publisherName,
+        rating,
+        title,
+        imagePath,
+      ] = row;
+
+      const image = fs.readFileSync(imagePath);
+      //console.log(image);
+      const newBook = new models.book({
+        title,
+        description,
+        image: {
+          data: image,
+          contentType: `image/${imagePath.split('.').slice(-1)}`,
+        },
+        publicationDate: +publicationDate,
+        numberOfPages: +numberOfPages,
+        price: +price,
+        rating: +rating,
+        publisherName,
+        authors: authors.split(',').map((author) => {
+          return { name: author };
+        }),
+        categories: categories.split(',').map((category) => ({
+          name: category,
+        })),
+      });
+      try {
+        await newBook.save();
+      } catch (err) {
+        console.log(err);
+      }
+    })
+    .on('error', function (error) {
+      console.log(error.message);
+    })
+    .on('end', function () {
+      console.log('finished');
+    });
+});*/
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

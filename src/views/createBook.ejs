@@ -9,9 +9,6 @@ include('alert') %>
           <small>Create Content</small>
         </h1>
       </div>
-      <div id="create-button" class="col-md-2">
-        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Add Book</button>
-      </div>
     </div>
   </div>
 </header>
@@ -25,11 +22,10 @@ include('alert') %>
             <h4 class="panel-title">Add Book</h4>
           </div>
           <form method="post" action="/admin/createBook" enctype="multipart/form-data">
-            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <div class="container">
               <div class="row mt-4 text-center">
                 <div id="place_for_pic" class="col-md-12">
-                  <img src="img/default.jpg" />
+                  <img src="/img/default.jpg" />
                   <div class="mt-4">
                     <label for="">Choose a picture: </label>
                     <input type="file" name="image" id="image" />

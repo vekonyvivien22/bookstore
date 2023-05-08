@@ -15,6 +15,7 @@ const bookSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     rating: { type: Number, required: false },
     publisherName: { type: String, required: true },
+    movie: { type: String },
     authors: [
       new mongoose.Schema({
         name: { type: String, required: true },

@@ -161,10 +161,10 @@ router.get('/book/:id', async (req, res) => {
       }
     }
   }
-  console.log(recommendedBookIds);
+  //console.log(recommendedBookIds);
 
   const recommendedBooks = await models.book.find({ _id: { $in: recommendedBookIds } });
-  //console.log(recommendedBooks);
+  //console.log(recommendedBooks.length);
 
   return res.render(templates.book, { book, storeStock, recommendedBooks });
 });

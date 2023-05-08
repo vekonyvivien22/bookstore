@@ -10,8 +10,9 @@
     </div>
     <div class="mb-5 col-md-8">
       <div class="p-4">
+        <button type="button" class="btn btn-link"><span class="bi bi-spotify"></span></button>
         <h1><%= book.title %></h1>
-        <h5><span></span><span> <%= book.publisherName %></span></h5>
+        <h5><%= book.publisherName %></h5>
         <% if(req.isAuthenticated() && req.user.regularUser.isRegular) {%>
         <h5><%= book.price %> Ft (-<%= req.user.regularUser.discount%>%)</h5>
         <% } else {%>
@@ -33,13 +34,74 @@
           <span><%= keys %> (<%= values %>), </span>
           <% }); %> </span
         ><br />
-
-        <a class="btn btn-primary mt-5" role="button" href="/user/add/<%=book.id%>">Add to cart!</a
-        ><br />
+        <div class="mt-5">
+          <a class="btn btn-primary" role="button" href="/user/add/<%=book.id%>">Add to cart!</a>
+        </div>
       </div>
     </div>
   </div>
+
+  <% if(recommendedBooks.length !== 0) {%>
+  <div class="mb-5" style="text-align: center"><h2>Recommended books:</h2></div>
+
+  <div class="bd-example container bg-dark mb-5">
+    <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
+      <ol class="carousel-indicators">
+        <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
+        <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
+        <li data-target="#carouselExampleCaptions" data-slide-to="2"></li>
+      </ol>
+      <div class="carousel-inner">
+        <% recommendedBooks.forEach(function(book){ %>
+        <div class="carousel-item">
+          <a href="/browse/book/<%=book.id%>">
+            <img
+              style="height: 250px; width: 168 px"
+              src="<% if(book.image.data){%>data:image/<%= book.image.contentType %>;base64,<%=book.image.data.toString('base64') %><% }else{%>/img/default.jpg<% }%>"
+              class="d-block m-auto"
+              alt="..."
+            />
+            <div class="carousel-caption d-none d-md-block text-right">
+              <h3><%= book.title %></h3>
+              <p class="card-text fa fa-star checked"><span><%= book.rating %></span></p>
+              <p class="card-text fa fa-calendar checked">
+                <span><%= book.publicationDate %></span>
+              </p>
+            </div>
+          </a>
+        </div>
+        <% }); %>
+      </div>
+      <a
+        class="carousel-control-prev"
+        href="#carouselExampleCaptions"
+        role="button"
+        data-slide="prev"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a
+        class="carousel-control-next"
+        href="#carouselExampleCaptions"
+        role="button"
+        data-slide="next"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+  </div>
+  <% } %> <% if(book.movie !== undefined) {%>
+  <div class="embed-responsive embed-responsive-16by9 mb-5">
+    <iframe class="embed-responsive-item" src="<%= book.movie%>" allowfullscreen></iframe>
+  </div>
+  <% } %>
 </div>
+
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
+<script>
+  $('.carousel-item:nth-child(1)').addClass('active');
+</script>
 <%- include('footer') %>

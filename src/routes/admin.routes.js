@@ -32,7 +32,7 @@ router.get('/', ensureAdmin, csrfProtection, async (req, res) => {
 });
 
 router.get('/createBook', ensureAdmin, csrfProtection, async (req, res) => {
-  return res.render(templates.createBook, { csrfToken: req.csrfToken(), error: null });
+  return res.render(templates.createBook, { error: null });
 });
 
 router.get('/manageBooks', ensureAdmin, csrfProtection, async (_req, res) => {
@@ -51,7 +51,6 @@ router.get('/manageUsers', ensureAdmin, csrfProtection, async (_req, res) => {
 router.post(
   '/createBook',
   ensureAdmin,
-  csrfProtection,
   Multer({ storage: Multer.memoryStorage() }).single('image'),
   async (req, res) => {
     const {
@@ -60,12 +59,12 @@ router.post(
       publicationDate,
       numberOfPages,
       price,
-      rating,
+      rating = 0,
       publisherName,
       authors,
       categories,
     } = req.body;
-    console.log(req.body);
+    //console.log(req.body);
     //console.log(req.file.originalname);
     let error;
     let newBook;
@@ -112,9 +111,9 @@ router.post(
       await newBook.save();
       return res.redirect('/admin/createBook');
     } catch (err) {
-      console.log(err);
+      //console.log(err);
       error = 'Error: cannot add book to database.';
-      return res.render(templates.createBook, { csrfToken: req.csrfToken(), error });
+      return res.render(templates.createBook, { error });
     }
   },
 );
